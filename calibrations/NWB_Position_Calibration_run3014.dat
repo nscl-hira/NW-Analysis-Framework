@@ -1,0 +1,27 @@
+* Neutron Wall position calibration
+* Position is calculated via : Xcm = (TLeft-TRight-Offset/c')*c'
+*Detector    Offset (cm)     c' (cm/ns)
+NWBbar01	   8.5777          7.2000
+NWBbar02	   -21.0597	       7.3398
+NWBbar03	   -14.7378	       7.2000
+NWBbar04	   -3.1951         7.2692
+NWBbar05	   10.6676         7.2000
+NWBbar06	   -21.9945	       7.3398
+NWBbar07	   -2.5401         7.0654
+NWBbar08	   35.2517         7.2692
+NWBbar09	   -10.8160	       7.4118
+NWBbar10	   40.7066         7.2000
+NWBbar11	   13.0122         7.2692
+NWBbar12	   44.8282         7.1321
+NWBbar13	   -41.6618	       7.2692
+NWBbar14	   -40.8086	       7.1321
+NWBbar15	   45.3278         7.0654
+NWBbar16	   0.8133          7.2000
+NWBbar17	   17.3499         7.2692
+NWBbar18	   32.3462         7.2692
+NWBbar19	   -13.9679	       7.0000
+NWBbar20	   23.4258         7.1321
+NWBbar21	   8.1361          7.1321
+NWBbar22	   -0.4314         7.0654
+NWBbar23	   3.1374          7.1321
+NWBbar24	   -3.5748         7.1321
