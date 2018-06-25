@@ -23,7 +23,7 @@ int main (int argc, char ** argv)
   std::string file_name(argv[1]);
   std::string run_range(file_name.substr(file_name.find(".root")-10, 10));
 
-  NWReader NWAnalyzer(dataChain, 1);
+  NWReader NWAnalyzer(dataChain, "NWA NWB", 1);
 
   std::string FileOutName(Form("output/NW_CosmicTimePositionHistograms%s.root", run_range.c_str()));
   NWAnalyzer.CreateNWCosmicsUsefulPlots(FileOutName.c_str(), evt_amount);

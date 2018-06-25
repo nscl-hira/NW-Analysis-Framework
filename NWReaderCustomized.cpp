@@ -49,63 +49,65 @@ void NWReader::CreateNWCosmicsUsefulPlots(const char * file_name, Long64_t evt_a
     int numhits=0;
     bool IsReferenceHit=false;
 
-/*
-    //Neutron Wall A
-    if(NWA->fmulti<6) continue;
-    numhits=0;
-    for(int i=0; i<NWA->fmulti; i++) {
-      NWAHitPattern->Fill(NWA->fXcm[i], NWA->fnumbar[i]);
-      if(NWA->fnumbar[i]==TimeReferenceBar) {
-        IsReferenceHit=true;
-        ReferenceTime=NWA->fTimeMean[i];
+    if(fIsNWA) {
+      //Neutron Wall B
+      if(NWA->fmulti<6) continue;
+      numhits=0;
+      for(int i=0; i<NWA->fmulti; i++) {
+        NWAHitPattern->Fill(NWA->fXcm[i], NWA->fnumbar[i]);
+        if(NWA->fnumbar[i]==TimeReferenceBar) {
+          IsReferenceHit=true;
+          ReferenceTime=NWA->fTimeMean[i];
+        }
+        TMean[numhits]=NWA->fTimeMean[i];
+        XPos[numhits]=NWA->fXcm[i];
+        YPos[numhits]=NWA->fnumbar[i]*fNWBarHigh;
+        numbar[numhits]=NWA->fnumbar[i];
+        numhits++;
       }
-      TMean[numhits]=NWA->fTimeMean[i];
-      XPos[numhits]=NWA->fXcm[i];
-      YPos[numhits]=NWA->fnumbar[i]*fNWAarHigh;
-      numbar[numhits]=NWA->fnumbar[i];
-      numhits++;
+      TGraph NWAtrack (numhits, YPos, XPos);
+      NWAtrack.Fit("pol1", "q");
+      TF1 * NWAtrackFunc = NWAtrack.GetFunction("pol1");
+      double NWAtrackAngle=atan(NWAtrackFunc->GetParameter(1));
+      for(int hit=0; hit<numhits; hit++) {
+        if(IsReferenceHit) {
+          NWATimeReferenceDiff->Fill(TMean[hit]-ReferenceTime,numbar[hit]);
+        }
+        NWAPositionPredictedCalculatedDiff[numbar[hit]]->Fill(NWAtrackFunc->Eval(YPos[hit])-XPos[hit]);
+        if(hit>1) {
+          NWATimePredictedCalculatedDiff[numbar[hit]]->Fill((numbar[hit]-numbar[hit-1])*fNWBarHigh/(cos(NWAtrackAngle)*fSpeedOfLight)-(TMean[hit]-TMean[hit-1]));
+        }
+      }
     }
-    TGraph NWAtrack (numhits, YPos, XPos);
-    NWAtrack.Fit("pol1", "q");
-    TF1 * NWAtrackFunc = NWAtrack.GetFunction("pol1");
-    double NWAtrackAngle=atan(NWAtrackFunc->GetParameter(1));
-    for(int hit=0; hit<numhits; hit++) {
-      if(IsReferenceHit) {
-        NWATimeReferenceDiff->Fill(TMean[hit]-ReferenceTime,numbar[hit]);
-      }
-      NWAPositionPredictedCalculatedDiff[numbar[hit]]->Fill(NWAtrackFunc->Eval(YPos[hit])-XPos[hit]);
-      if(hit>1) {
-        NWATimePredictedCalculatedDiff[numbar[hit]]->Fill((numbar[hit]-numbar[hit-1])*fNWAarHigh/(cos(NWAtrackAngle)*fSpeedOfLight)-(TMean[hit]-TMean[hit-1]));
-      }
-    }
-    */
 
-    //Neutron Wall B
-    if(NWB->fmulti<6) continue;
-    numhits=0;
-    for(int i=0; i<NWB->fmulti; i++) {
-      NWBHitPattern->Fill(NWB->fXcm[i], NWB->fnumbar[i]);
-      if(NWB->fnumbar[i]==TimeReferenceBar) {
-        IsReferenceHit=true;
-        ReferenceTime=NWB->fTimeMean[i];
+    if(fIsNWB) {
+      //Neutron Wall B
+      if(NWB->fmulti<6) continue;
+      numhits=0;
+      for(int i=0; i<NWB->fmulti; i++) {
+        NWBHitPattern->Fill(NWB->fXcm[i], NWB->fnumbar[i]);
+        if(NWB->fnumbar[i]==TimeReferenceBar) {
+          IsReferenceHit=true;
+          ReferenceTime=NWB->fTimeMean[i];
+        }
+        TMean[numhits]=NWB->fTimeMean[i];
+        XPos[numhits]=NWB->fXcm[i];
+        YPos[numhits]=NWB->fnumbar[i]*fNWBarHigh;
+        numbar[numhits]=NWB->fnumbar[i];
+        numhits++;
       }
-      TMean[numhits]=NWB->fTimeMean[i];
-      XPos[numhits]=NWB->fXcm[i];
-      YPos[numhits]=NWB->fnumbar[i]*fNWBarHigh;
-      numbar[numhits]=NWB->fnumbar[i];
-      numhits++;
-    }
-    TGraph NWBtrack (numhits, YPos, XPos);
-    NWBtrack.Fit("pol1", "q");
-    TF1 * NWBtrackFunc = NWBtrack.GetFunction("pol1");
-    double NWBtrackAngle=atan(NWBtrackFunc->GetParameter(1));
-    for(int hit=0; hit<numhits; hit++) {
-      if(IsReferenceHit) {
-        NWBTimeReferenceDiff->Fill(TMean[hit]-ReferenceTime,numbar[hit]);
-      }
-      NWBPositionPredictedCalculatedDiff[numbar[hit]]->Fill(NWBtrackFunc->Eval(YPos[hit])-XPos[hit]);
-      if(hit>1) {
-        NWBTimePredictedCalculatedDiff[numbar[hit]]->Fill((numbar[hit]-numbar[hit-1])*fNWBarHigh/(cos(NWBtrackAngle)*fSpeedOfLight)-(TMean[hit]-TMean[hit-1]));
+      TGraph NWBtrack (numhits, YPos, XPos);
+      NWBtrack.Fit("pol1", "q");
+      TF1 * NWBtrackFunc = NWBtrack.GetFunction("pol1");
+      double NWBtrackAngle=atan(NWBtrackFunc->GetParameter(1));
+      for(int hit=0; hit<numhits; hit++) {
+        if(IsReferenceHit) {
+          NWBTimeReferenceDiff->Fill(TMean[hit]-ReferenceTime,numbar[hit]);
+        }
+        NWBPositionPredictedCalculatedDiff[numbar[hit]]->Fill(NWBtrackFunc->Eval(YPos[hit])-XPos[hit]);
+        if(hit>1) {
+          NWBTimePredictedCalculatedDiff[numbar[hit]]->Fill((numbar[hit]-numbar[hit-1])*fNWBarHigh/(cos(NWBtrackAngle)*fSpeedOfLight)-(TMean[hit]-TMean[hit-1]));
+        }
       }
     }
 
@@ -138,8 +140,16 @@ void NWReader::CreateNWToFPlots(const char * file_name, Long64_t evt_amount)
   TFile * FileOut = new TFile(file_name, "RECREATE");
 
   TH1D * FANWBToF[NUM_DETECTORS_FA];
+  TH2D * FAWBWToFvsE[NUM_DETECTORS_FA];
+  TH2D * FAWBWToFvsDist[NUM_DETECTORS_FA];
+  //TH2D * FANWBToFNeighbourLeft[NUM_DETECTORS_FA];
+  //TH2D * FANWBToFNeighbourRight[NUM_DETECTORS_FA];
   for(int i=0; i<NUM_DETECTORS_FA; i++) {
-    FANWBToF[i] = new TH1D(Form("FA%02dNWBToF", i),"",1000,-150,150);
+    FANWBToF[i] = new TH1D(Form("FA%02dNWBToF", i+1),"",1000,-150,150);
+    FAWBWToFvsE[i] = new TH2D(Form("FA%02dNWBToFvsE", i+1),"",3000,-70,70,2048,0,4095);
+    FAWBWToFvsDist[i] = new TH2D(Form("FA%02dNWBToFvsDist", i+1),"",3000,-70,70,500,400,500);
+    //FANWBToFNeighbourLeft[i] = new TH2D(Form("FA%02dNWBToFNeighbourLeft", i+1),"",2000,-70,70,2000,-70,70);
+    //FANWBToFNeighbourRight[i] = new TH2D(Form("FA%02dNWBToFNeighbourRight", i+1),"",2000,-70,70,2000,-70,70);
   }
 
   Long64_t nentries=fChain->GetEntries();
@@ -154,15 +164,29 @@ void NWReader::CreateNWToFPlots(const char * file_name, Long64_t evt_amount)
       printf("Percentage = %.2f %%\n", 100*double(jentry)/nentries);
     }
 
-    NeutronWallCalibratedData * NWA = fNWACal->Get();
-    NeutronWallCalibratedData * NWB = fNWBCal->Get();
-    ForwardArrayCalibratedData * ForwardArray = fForwardArrayCal->Get();
-
-    for(int FAhit=0; FAhit<ForwardArray->fmulti; FAhit++)
-    {
-      if(ForwardArray->fE[FAhit]<300) continue;
-      for(int NWhit=0; NWhit<NWB->fmulti; NWhit++) {
-        FANWBToF[ForwardArray->fnumdet[FAhit]-1]->Fill(NWB->fTimeMean[NWhit]-ForwardArray->fTime[FAhit]);
+    if(fIsNWB && fIsFA) {
+      NeutronWallCalibratedData * NWB = fNWBCal->Get();
+      ForwardArrayCalibratedData * ForwardArray = fForwardArrayCal->Get();
+      for(int FAhit=0; FAhit<ForwardArray->fmulti; FAhit++)
+      {
+        for(int NWhit=0; NWhit<NWB->fmulti; NWhit++) {
+          // I record the ToF spectrum only if the FA element has a significant energy (more than 300)
+          if(ForwardArray->fE[FAhit]>300) FANWBToF[ForwardArray->fnumdet[FAhit]-1]->Fill(NWB->fTimeMean[NWhit]-ForwardArray->fTime[FAhit]);
+          //I record the E vs ToF spectrum only if the time of the FA element is close to the time minimum (3 ns max)
+          if(fabs(ForwardArray->fTime[FAhit]-ForwardArray->fTimeMin)<3) {
+            FAWBWToFvsE[ForwardArray->fnumdet[FAhit]-1]->Fill(NWB->fTimeMean[NWhit]-ForwardArray->fTime[FAhit],ForwardArray->fE[FAhit]);
+            FAWBWToFvsDist[ForwardArray->fnumdet[FAhit]-1]->Fill(NWB->fTimeMean[NWhit]-ForwardArray->fTime[FAhit],NWB->fDistcm[NWhit]);
+          }
+          //Cross talk analysis, I plot the ToF signals in two consecutive detectors to see if the are correlated
+          /*
+          if(ForwardArray->fE[FAhit]>300) {
+            for(int FANeighbourHit=0; FANeighbourHit<ForwardArray->fmulti; FANeighbourHit++) {
+              if((ForwardArray->fnumdet[FANeighbourHit]-ForwardArray->fnumdet[FAhit])==1) FANWBToFNeighbourLeft[ForwardArray->fnumdet[FAhit]-1]->Fill(NWB->fTimeMean[NWhit]-ForwardArray->fTime[FANeighbourHit],NWB->fTimeMean[NWhit]-ForwardArray->fTime[FAhit]);
+              if((ForwardArray->fnumdet[FANeighbourHit]-ForwardArray->fnumdet[FAhit])==-1) FANWBToFNeighbourRight[ForwardArray->fnumdet[FAhit]-1]->Fill(NWB->fTimeMean[NWhit]-ForwardArray->fTime[FANeighbourHit],NWB->fTimeMean[NWhit]-ForwardArray->fTime[FAhit]);
+            }
+          }
+          */
+        }
       }
     }
   }
@@ -170,6 +194,9 @@ void NWReader::CreateNWToFPlots(const char * file_name, Long64_t evt_amount)
   //Saving histograms to file
   for(int i=0; i<NUM_DETECTORS_FA; i++) {
     FileOut->WriteTObject(FANWBToF[i], FANWBToF[i]->GetName());
+    FileOut->WriteTObject(FAWBWToFvsE[i], FAWBWToFvsE[i]->GetName());
+    //FileOut->WriteTObject(FANWBToFNeighbourLeft[i], FANWBToFNeighbourLeft[i]->GetName());
+    //FileOut->WriteTObject(FANWBToFNeighbourRight[i], FANWBToFNeighbourRight[i]->GetName());
   }
 
   // closing output file

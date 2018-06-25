@@ -1,7 +1,7 @@
 #include "include/NWReader.h"
 
 //____________________________________________________
-NWReader::NWReader(TChain *Chain, bool IsDataCalibrated) :
+NWReader::NWReader(TChain *Chain, const char * DataType, bool IsDataCalibrated) :
 fChain(Chain),
 fDegToRad(TMath::Pi()/180.),
 fRadToDeg(180./TMath::Pi()),
@@ -9,6 +9,10 @@ fSpeedOfLight(29.9792),
 fNWBarLength(200),
 fNWBarHigh(7.62),
 fNWBarThickness(6.35),
+fIsNWA(false),
+fIsNWB(false),
+fIsFA(false),
+fIsVW(false),
 fIsDataCalibrated(IsDataCalibrated),
 fNWAPositionCalibrated(false),
 fNWBPositionCalibrated(false),
@@ -18,48 +22,61 @@ fNWACosmicRayPositionLoaded(false),
 fNWBCosmicRayPositionLoaded(false),
 fNWATimeCalibrated(false),
 fNWBTimeCalibrated(false),
-fNWAPositionCalibration(0),
-fNWBPositionCalibration(0),
-fNWACosmicRayInfo(0),
-fNWBCosmicRayInfo(0),
-fNWATimeCalibration(0),
-fNWBTimeCalibration(0)
+fNWAGeometryCalibrated(false),
+fNWBGeometryCalibrated(false),
+fFATimeCalibrated(false),
+fNWAPositionCalibration(new NWPositionCalibration(NUM_BARS_NWA)),
+fNWBPositionCalibration(new NWPositionCalibration(NUM_BARS_NWB)),
+fNWACosmicRayInfo(new NWCosmicRayManager(NUM_BARS_NWA)),
+fNWBCosmicRayInfo(new NWCosmicRayManager(NUM_BARS_NWB)),
+fNWATimeCalibration(new NWTimeCalibration(NUM_BARS_NWA)),
+fNWBTimeCalibration(new NWTimeCalibration(NUM_BARS_NWB)),
+fNWAGeometry(new NWGeometry(NUM_BARS_NWA)),
+fNWBGeometry(new NWGeometry(NUM_BARS_NWB)),
+fFATimeCalibration(new FATimeCalibration(NUM_DETECTORS_FA))
 {
+  //Parsing DataType string to allocate specific detectors
+  std::string DetectorsIncluded(DataType);
+  std::istringstream StreamDetectorsIncluded(DetectorsIncluded);
+  std::string DetectorToAdd;
+  while (StreamDetectorsIncluded>>DetectorToAdd) {
+    if(DetectorToAdd.compare("NWA")==0) fIsNWA=true;
+    if(DetectorToAdd.compare("NWB")==0) fIsNWB=true;
+    if(DetectorToAdd.compare("FA")==0) fIsFA=true;
+    if(DetectorToAdd.compare("VW")==0) fIsVW=true;
+  }
+
   if(fChain!=0) {
     fNWReader = new TTreeReader(fChain);
     if(!fIsDataCalibrated) {
-      fNWA = new TTreeReaderValue<HTNeutronWallData>(*fNWReader, "NWA.");
-      fNWB = new TTreeReaderValue<HTNeutronWallData>(*fNWReader, "NWB.");
-      fForwardArray = new TTreeReaderValue<HTForwardArrayData>(*fNWReader, "ForwardArray.");
-      fVetoWall = new TTreeReaderValue<HTVetoWallData>(*fNWReader, "VetoWall.");
+      if(fIsNWA) fNWA = new TTreeReaderValue<HTNeutronWallData>(*fNWReader, "NWA.");
+      if(fIsNWB) fNWB = new TTreeReaderValue<HTNeutronWallData>(*fNWReader, "NWB.");
+      if(fIsFA) fForwardArray = new TTreeReaderValue<HTForwardArrayData>(*fNWReader, "ForwardArray.");
+      if(fIsVW) fVetoWall = new TTreeReaderValue<HTVetoWallData>(*fNWReader, "VetoWall.");
     } else {
-      fNWACal = new TTreeReaderValue<NeutronWallCalibratedData>(*fNWReader, "NWA.");
-      fNWBCal = new TTreeReaderValue<NeutronWallCalibratedData>(*fNWReader, "NWB.");
-      fForwardArrayCal = new TTreeReaderValue<ForwardArrayCalibratedData>(*fNWReader, "ForwardArray.");
+      if(fIsNWA) fNWACal = new TTreeReaderValue<NeutronWallCalibratedData>(*fNWReader, "NWA.");
+      if(fIsNWB) fNWBCal = new TTreeReaderValue<NeutronWallCalibratedData>(*fNWReader, "NWB.");
+      if(fIsFA) fForwardArrayCal = new TTreeReaderValue<ForwardArrayCalibratedData>(*fNWReader, "ForwardArray.");
+      if(fIsVW) fVetoWallCal = new TTreeReaderValue<VetoWallCalibratedData>(*fNWReader, "VetoWall.");
     }
   }
-  fNWAPositionCalibration = new NWPositionCalibration(NUM_BARS_NWA);
-  fNWBPositionCalibration = new NWPositionCalibration(NUM_BARS_NWB);
-  fNWACosmicRayInfo = new NWCosmicRayManager(NUM_BARS_NWA);
-  fNWBCosmicRayInfo = new NWCosmicRayManager(NUM_BARS_NWB);
-  fNWATimeCalibration = new NWTimeCalibration(NUM_BARS_NWA);
-  fNWBTimeCalibration = new NWTimeCalibration(NUM_BARS_NWB);
-  fFATimeCalibration = new FATimeCalibration(NUM_DETECTORS_FA);
 }
 
 //____________________________________________________
 NWReader::~NWReader()
 {
   if(fChain!=0) {
+    delete fNWReader;
     if(!fIsDataCalibrated) {
-      delete fNWReader;
-      delete fNWA;
-      delete fNWB;
-      delete fForwardArray;
-      delete fVetoWall;
+      if (fIsNWA) delete fNWA;
+      if (fIsNWB) delete fNWB;
+      if (fIsFA) delete fForwardArray;
+      if (fIsVW) delete fVetoWall;
     } else {
-      delete fNWACal;
-      delete fNWBCal;
+      if (fIsNWA) delete fNWACal;
+      if (fIsNWB) delete fNWBCal;
+      if (fIsFA) delete fForwardArrayCal;
+      if (fIsVW) delete fVetoWallCal;
     }
   }
 
@@ -70,6 +87,8 @@ NWReader::~NWReader()
   if(fNWATimeCalibration) delete fNWATimeCalibration;
   if(fNWBTimeCalibration) delete fNWBTimeCalibration;
   if(fFATimeCalibration) delete fFATimeCalibration;
+  if(fNWAGeometry) delete fNWAGeometry;
+  if(fNWBGeometry) delete fNWBGeometry;
 }
 
 //____________________________________________________
@@ -79,6 +98,7 @@ int NWReader::LoadNWPositionCalibration(const char * file_name, const char * Wal
     int NLines=fNWAPositionCalibration->LoadCalibration(file_name);
     if(NLines>0) {
       fNWAPositionCalibrated=true;
+      printf("Loaded position calibration for NWA %s\n", file_name);
       return NLines;
     }
     fNWAPositionCalibrated=false;
@@ -87,6 +107,7 @@ int NWReader::LoadNWPositionCalibration(const char * file_name, const char * Wal
     int NLines=fNWBPositionCalibration->LoadCalibration(file_name);
     if(NLines>0) {
       fNWBPositionCalibrated=true;
+      printf("Loaded position calibration for NWB %s\n", file_name);
       return NLines;
     }
     fNWBPositionCalibrated=false;
@@ -103,6 +124,7 @@ int NWReader::LoadNWCosmicRayPosition(const char * file_name, const char * WallT
     int NLines=fNWACosmicRayInfo->LoadPeakPositions(file_name);
     if(NLines>0) {
       fNWACosmicRayPositionLoaded=true;
+      printf("Loaded cosmics calibration for NWA %s\n", file_name);
       return NLines;
     }
     fNWACosmicRayPositionLoaded=false;
@@ -111,6 +133,7 @@ int NWReader::LoadNWCosmicRayPosition(const char * file_name, const char * WallT
     int NLines=fNWBCosmicRayInfo->LoadPeakPositions(file_name);
     if(NLines>0) {
       fNWBCosmicRayPositionLoaded=true;
+      printf("Loaded cosmics calibration for NWB %s\n", file_name);
       return NLines;
     }
     fNWBCosmicRayPositionLoaded=false;
@@ -127,6 +150,7 @@ int NWReader::LoadNWTimeCalibration(const char * file_name, const char * WallToC
     int NLines=fNWATimeCalibration->LoadCalibration(file_name);
     if(NLines>0) {
       fNWATimeCalibrated=true;
+      printf("Loaded time calibration for NWA %s\n", file_name);
       return NLines;
     }
     fNWATimeCalibrated=false;
@@ -135,6 +159,7 @@ int NWReader::LoadNWTimeCalibration(const char * file_name, const char * WallToC
     int NLines=fNWBTimeCalibration->LoadCalibration(file_name);
     if(NLines>0) {
       fNWBTimeCalibrated=true;
+      printf("Loaded time calibration for NWB %s\n", file_name);
       return NLines;
     }
     fNWBTimeCalibrated=false;
@@ -145,11 +170,53 @@ int NWReader::LoadNWTimeCalibration(const char * file_name, const char * WallToC
 }
 
 //____________________________________________________
+int NWReader::LoadNWGeometryFiducialPoints(const char * file_name, const char * WallToCalibrate)
+{
+  if(strcmp(WallToCalibrate,"NWA")==0) {
+    int NLines=fNWAGeometry->LoadFiducialPoints(file_name);
+    if(NLines>0) {
+      fNWAGeometryCalibrated=true;
+      printf("Loaded geometry fiducial points for NWA %s\n", file_name);
+      return NLines;
+    }
+    fNWAGeometryCalibrated=false;
+  }
+  if(strcmp(WallToCalibrate,"NWB")==0) {
+    int NLines=fNWBGeometry->LoadFiducialPoints(file_name);
+    if(NLines>0) {
+      fNWBGeometryCalibrated=true;
+      printf("Loaded geometry fiducial points for NWB %s\n", file_name);
+      return NLines;
+    }
+    fNWBGeometryCalibrated=false;
+  }
+
+  printf("Error: Error while loading NW geometry fiducial points %s\n", file_name);
+  return -1;
+}
+
+//____________________________________________________
 int NWReader::LoadFATimeCalibration(const char * file_name)
 {
   int NLines=fFATimeCalibration->LoadCalibration(file_name);
   if(NLines>0) {
     fFATimeCalibrated=true;
+    printf("Loaded time calibration for FA %s\n", file_name);
+    return NLines;
+  } else {
+    fFATimeCalibrated=false;
+    printf("Error: Error while loading FA time calibration %s\n", file_name);
+    return -1;
+  }
+}
+
+//____________________________________________________
+int NWReader::LoadTimePulseHeightCorrection(const char * file_name)
+{
+  int NLines=fFATimeCalibration->LoadPulseHeightCorrection(file_name);
+  if(NLines>0) {
+    fFATimeCalibrated=true;
+    printf("Loaded time pulse height correction for FA %s\n", file_name);
     return NLines;
   } else {
     fFATimeCalibrated=false;
@@ -210,6 +277,84 @@ double NWReader::GetNWBTimeMean(int num_bar, double tleft, double tright) const
 double NWReader::GetFATimeOffset(int num_det) const
 {
   return fFATimeCalibrated ? fFATimeCalibration->GetTimeOffset(num_det) : 0;
+}
+
+//____________________________________________________
+double NWReader::GetNWATheta(int num_bar, double Xcm) const
+{
+  return fNWAGeometryCalibrated ? fNWAGeometry->GetTheta(num_bar, Xcm) : -9999;
+}
+
+//____________________________________________________
+double NWReader::GetNWAPhi(int num_bar, double Xcm) const
+{
+  return fNWAGeometryCalibrated ? fNWAGeometry->GetPhi(num_bar, Xcm) : -9999;
+}
+
+//____________________________________________________
+double NWReader::GetNWAThetaRan(int num_bar, double Xcm) const
+{
+  return fNWAGeometryCalibrated ? fNWAGeometry->GetThetaRan(num_bar, Xcm) : -9999;
+}
+
+//____________________________________________________
+double NWReader::GetNWAPhiRan(int num_bar, double Xcm) const
+{
+  return fNWAGeometryCalibrated ? fNWAGeometry->GetPhiRan(num_bar, Xcm) : -9999;
+}
+
+//____________________________________________________
+double NWReader::GetNWADistance(int num_bar, double Xcm) const
+{
+  return fNWAGeometryCalibrated ? fNWAGeometry->GetR(num_bar, Xcm) : -9999;
+}
+
+//____________________________________________________
+double NWReader::GetNWADistanceRan(int num_bar, double Xcm) const
+{
+  return fNWAGeometryCalibrated ? fNWAGeometry->GetRRan(num_bar, Xcm) : -9999;
+}
+
+//____________________________________________________
+double NWReader::GetNWBTheta(int num_bar, double Xcm) const
+{
+  return fNWBGeometryCalibrated ? fNWBGeometry->GetTheta(num_bar, Xcm) : -9999;
+}
+
+//____________________________________________________
+double NWReader::GetNWBPhi(int num_bar, double Xcm) const
+{
+  return fNWBGeometryCalibrated ? fNWBGeometry->GetPhi(num_bar, Xcm) : -9999;
+}
+
+//____________________________________________________
+double NWReader::GetNWBThetaRan(int num_bar, double Xcm) const
+{
+  return fNWBGeometryCalibrated ? fNWBGeometry->GetThetaRan(num_bar, Xcm) : -9999;
+}
+
+//____________________________________________________
+double NWReader::GetNWBPhiRan(int num_bar, double Xcm) const
+{
+  return fNWBGeometryCalibrated ? fNWBGeometry->GetPhiRan(num_bar, Xcm) : -9999;
+}
+
+//____________________________________________________
+double NWReader::GetNWBDistance(int num_bar, double Xcm) const
+{
+  return fNWBGeometryCalibrated ? fNWBGeometry->GetR(num_bar, Xcm) : -9999;
+}
+
+//____________________________________________________
+double NWReader::GetNWBDistanceRan(int num_bar, double Xcm) const
+{
+  return fNWBGeometryCalibrated ? fNWBGeometry->GetRRan(num_bar, Xcm) : -9999;
+}
+
+//____________________________________________________
+double NWReader::GetFATimePulseHeightCorrection(int num_det, double pulse_height) const
+{
+  return fFATimeCalibrated ? fFATimeCalibration->GetTimePulseHeightCorrection(num_det, pulse_height) : 0;
 }
 
 //____________________________________________________

@@ -7,10 +7,11 @@ ObjSuf    := o
 DepSuf    := h
 PcmSuf    := _rdict.pcm
 
-OBJS := NWReader.$(ObjSuf) NWReaderData.$(ObjSuf) NWReaderCustomized.$(ObjSuf)
+OBJS := NWReader.$(ObjSuf) NWReaderData.$(ObjSuf) NWReaderCustomized.$(ObjSuf) shared.$(ObjSuf)
 OBJS += HTNeutronWallRootEvent.$(ObjSuf) HTForwardArrayRootEvent.$(ObjSuf) HTVetoWallRootEvent.$(ObjSuf)
+OBJS += NWPositionCalibration.$(ObjSuf) NWCosmicRayManager.$(ObjSuf) NWTimeCalibration.$(ObjSuf) NWGeometry.$(ObjSuf)
+OBJS += FATimeCalibration.$(ObjSuf)
 OBJS += NWCalibratedRootEvent.$(ObjSuf)
-OBJS += NWPositionCalibration.$(ObjSuf) NWCosmicRayManager.$(ObjSuf) NWTimeCalibration.$(ObjSuf) FATimeCalibration.$(ObjSuf) shared.$(ObjSuf)
 DEPS := $(_OBJS:.$(ObjSuf)=.$(DepSuf))
 
 ROOTHTNW_HDRS  := HTNeutronWallRootEvent.h HTNeutronWallLinkDef.h

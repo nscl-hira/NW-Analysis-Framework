@@ -10,5 +10,6 @@
   gROOT->ProcessLine(".L NWCosmicRayManager.cpp");
   gROOT->ProcessLine(".L NWPositionCalibration.cpp");
   gROOT->ProcessLine(".L NWTimeCalibration.cpp");
+  gROOT->ProcessLine(".L NWGeometry.cpp");
   gROOT->ProcessLine(".L FATimeCalibration.cpp");
 }

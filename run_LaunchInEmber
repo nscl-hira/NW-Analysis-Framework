@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FRAMEWORK_PATH="/projects/hira/15190-14030/Daniele/NW_Calibrations/"
+FRAMEWORK_PATH="/projects/hira/Daniele/NW-Analysis-Framework-"
 
 cat > submit.sh << EOF
 #!/usr/bin/env bash
@@ -10,7 +10,7 @@ cat > submit.sh << EOF
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=5000
 #SBATCH --job-name=$2
-#SBATCH --output=slurm/$1_$2.out
+#SBATCH --output=slurm/$1.out
 
 
 module add intel
