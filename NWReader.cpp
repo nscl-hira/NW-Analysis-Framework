@@ -24,6 +24,10 @@ fNWATimeCalibrated(false),
 fNWBTimeCalibrated(false),
 fNWAGeometryCalibrated(false),
 fNWBGeometryCalibrated(false),
+fNWAPulseHeightMatched(false),
+fNWBPulseHeightMatched(false),
+fNWAPulseHeightCalibrated(false),
+fNWBPulseHeightCalibrated(false),
 fFATimeCalibrated(false),
 fNWAPositionCalibration(new NWPositionCalibration(NUM_BARS_NWA)),
 fNWBPositionCalibration(new NWPositionCalibration(NUM_BARS_NWB)),
@@ -33,6 +37,8 @@ fNWATimeCalibration(new NWTimeCalibration(NUM_BARS_NWA)),
 fNWBTimeCalibration(new NWTimeCalibration(NUM_BARS_NWB)),
 fNWAGeometry(new NWGeometry(NUM_BARS_NWA)),
 fNWBGeometry(new NWGeometry(NUM_BARS_NWB)),
+fNWAPulseHeightCalibrationTools(new NWPulseHeightCalibration(NUM_BARS_NWA)),
+fNWBPulseHeightCalibrationTools(new NWPulseHeightCalibration(NUM_BARS_NWB)),
 fFATimeCalibration(new FATimeCalibration(NUM_DETECTORS_FA))
 {
   //Parsing DataType string to allocate specific detectors
@@ -211,7 +217,7 @@ int NWReader::LoadFATimeCalibration(const char * file_name)
 }
 
 //____________________________________________________
-int NWReader::LoadTimePulseHeightCorrection(const char * file_name)
+int NWReader::LoadFATimePulseHeightCorrection(const char * file_name)
 {
   int NLines=fFATimeCalibration->LoadPulseHeightCorrection(file_name);
   if(NLines>0) {
@@ -377,12 +383,22 @@ void NWReader::Loop(const char * file_name, Long64_t evt_amount)
       printf("Percentage = %.2f %%\n", 100*double(jentry)/nentries);
     }
 
-    HTNeutronWallData * NWA = fNWA->Get();
-    HTNeutronWallData * NWB = fNWB->Get();
-    HTVetoWallData * VetoWall = fVetoWall->Get();
-    HTForwardArrayData * ForwardArray = fForwardArray->Get();
-
-    // Insert here code
+    if (fIsNWA) {
+      NeutronWallCalibratedData * NWA = fNWACal->Get();
+      //Insert NWA code here
+    }
+    if (fIsNWB) {
+      NeutronWallCalibratedData * NWB = fNWBCal->Get();
+      //Insert NWB code here
+    }
+    if (fIsFA) {
+      HTForwardArrayData * ForwardArray = fForwardArray->Get();
+      //Insert ForwardArray code here
+    }
+    if (fIsVW) {
+      HTVetoWallData * VetoWall = fVetoWall->Get();
+      //Insert VetoWall code here
+    }
 
     jentry++;
   }
@@ -411,8 +427,22 @@ void NWReader::LoopOnCalibratedData(const char * file_name, Long64_t evt_amount)
       printf("Percentage = %.2f %%\n", 100*double(jentry)/nentries);
     }
 
-    NeutronWallCalibratedData * NWA = fNWACal->Get();
-    NeutronWallCalibratedData * NWB = fNWBCal->Get();
+    if (fIsNWA) {
+      NeutronWallCalibratedData * NWA = fNWACal->Get();
+      //Insert NWA code here
+    }
+    if (fIsNWB) {
+      NeutronWallCalibratedData * NWB = fNWBCal->Get();
+      //Insert NWB code here
+    }
+    if (fIsFA) {
+      ForwardArrayCalibratedData * ForwardArray = fForwardArrayCal->Get();
+      //Insert ForwardArray code here
+    }
+    if (fIsVW) {
+      VetoWallCalibratedData * VetoWall = fVetoWallCal->Get();
+      //Insert VetoWall code here
+    }
 
     // Insert here code
 

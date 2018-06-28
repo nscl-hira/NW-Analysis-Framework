@@ -126,7 +126,7 @@ void NWReader::BuildCosmicRayData(const char * file_name, Long64_t evt_amount)
   // this method constructs data for cosmic rays
   // to remove the low energy noise a cut in proximity of
   // cosmic peaks is made.
-  if(!fNWACosmicRayPositionLoaded || !fNWBCosmicRayPositionLoaded) {
+  if(!fNWACosmicRayPositionLoaded && !fNWBCosmicRayPositionLoaded) {
     printf("Error: Cosmic Ray position not loaded\n");
     return;
   }

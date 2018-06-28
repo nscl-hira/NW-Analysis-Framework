@@ -35,13 +35,13 @@ int main (int argc, char ** argv)
     printf("%d Root files added to chain for run %d\n", n_files, i);
   }
 
-  NWReader NWAnalyzer(dataChain);
+  NWReader NWAnalyzer(dataChain, "NWA NWB");
   NWAnalyzer.LoadNWPositionCalibration("calibrations/NWB_Position_Calibration_run3014.dat", "NWB");
   NWAnalyzer.LoadNWPositionCalibration("calibrations/NWA_Position_Calibration_run3014.dat", "NWA");
   NWAnalyzer.LoadNWCosmicRayPosition("calibrations/NWB_Cosmic_Ray_Peaks_run3014.dat", "NWB");
   NWAnalyzer.LoadNWCosmicRayPosition("calibrations/NWA_Cosmic_Ray_Peaks_run3014.dat", "NWA");
   NWAnalyzer.LoadNWTimeCalibration("calibrations/NWB_Time_Offset_run3013.dat", "NWB");
-
+  
   std::string FileOutName(Form("output/NW_CosmicData_%04d_%04d.root", first_run, last_run));
   NWAnalyzer.BuildCosmicRayData(FileOutName.c_str(), evt_amount);
 

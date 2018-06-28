@@ -1,2 +1,0 @@
-* FA Pulse Height correction with a [0]-[1]*exp(-[2]*x) formula
-*sector             a0             a1             a2

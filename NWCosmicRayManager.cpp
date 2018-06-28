@@ -43,7 +43,7 @@ int NWCosmicRayManager::LoadPeakPositions(const char * file_name)
     double sigma;
 
     LineStream>>DetName>>center>>sigma;
-
+    
     int NumBar=std::stoi(DetName.substr(DetName.find("bar")+3));
     fCenter[NumBar]=center;
     fSigma[NumBar]=sigma;
@@ -63,6 +63,6 @@ double NWCosmicRayManager::GetCosmicRayCenter(int num_bar) const
 
 //____________________________________________________
 double NWCosmicRayManager::GetCosmicRayStartingPoint(int num_bar) const
-{
+{ 
   return fPositionLoaded ? fCenter[num_bar]-2*fSigma[num_bar] : -9999;
 }

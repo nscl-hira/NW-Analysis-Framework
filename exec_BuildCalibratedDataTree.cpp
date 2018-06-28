@@ -40,10 +40,10 @@ int main (int argc, char ** argv)
   NWAnalyzer.LoadNWPositionCalibration("calibrations/NWA_Position_Calibration_run3014.dat", "NWA");
   NWAnalyzer.LoadNWGeometryFiducialPoints("calibrations/NWB_Geometry.dat", "NWB");
   NWAnalyzer.LoadNWTimeCalibration("calibrations/NWB_Time_Offset_run3013.dat", "NWB");
-  //NWAnalyzer.LoadFATimeCalibration("calibrations/FA_Time_Offset_run4557.dat");
+  NWAnalyzer.LoadFATimeCalibration("calibrations/FA_Time_Offset_run4557.dat");
   //NWAnalyzer.LoadFATimeCalibration("calibrations/FA_Time_Offset_run2523.dat");
-  //NWAnalyzer.LoadTimePulseHeightCorrection("calibrations/FA_PulseHeightCorrection_run4543.dat");
-  NWAnalyzer.LoadTimePulseHeightCorrection("calibrations/FA_PulseHeightCorrection_run2523.dat");
+  NWAnalyzer.LoadFATimePulseHeightCorrection("calibrations/FA_PulseHeightCorrection_run4543.dat");
+  //NWAnalyzer.LoadFATimePulseHeightCorrection("calibrations/FA_PulseHeightCorrection_run2523.dat");
 
   std::string FileOutName(Form("output/CalibratedData_%04d_%04d.root", first_run, last_run));
   NWAnalyzer.BuildCalibratedTree(FileOutName.c_str(), evt_amount);

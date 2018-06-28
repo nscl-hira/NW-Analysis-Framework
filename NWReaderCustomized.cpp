@@ -195,6 +195,7 @@ void NWReader::CreateNWToFPlots(const char * file_name, Long64_t evt_amount)
   for(int i=0; i<NUM_DETECTORS_FA; i++) {
     FileOut->WriteTObject(FANWBToF[i], FANWBToF[i]->GetName());
     FileOut->WriteTObject(FAWBWToFvsE[i], FAWBWToFvsE[i]->GetName());
+    FileOut->WriteTObject(FAWBWToFvsDist[i], FAWBWToFvsDist[i]->GetName());
     //FileOut->WriteTObject(FANWBToFNeighbourLeft[i], FANWBToFNeighbourLeft[i]->GetName());
     //FileOut->WriteTObject(FANWBToFNeighbourRight[i], FANWBToFNeighbourRight[i]->GetName());
   }

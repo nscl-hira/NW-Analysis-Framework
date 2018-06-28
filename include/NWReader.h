@@ -28,6 +28,7 @@
 #include "NWTimeCalibration.h"
 #include "NWGeometry.h"
 #include "FATimeCalibration.h"
+#include "NWPulseHeightCalibration.h"
 
 #include "shared.h"
 
@@ -40,11 +41,12 @@ public :
 
   int LoadNWPositionCalibration(const char * file_name, const char * WallToCalibrate);
   int LoadNWTimeCalibration(const char * file_name, const char * WallToCalibrate);
-  int LoadNWPulseHeightCalibration(const char * file_name, const char * WallToCalibrate);
   int LoadNWCosmicRayPosition(const char *, const char * WallToCalibrate);
   int LoadNWGeometryFiducialPoints(const char *, const char * WallToCalibrate);
+  int LoadNWPulseHeightMatching(const char *, const char * WallToCalibrate);
+  int LoadNWPulseHeightCalibration(const char *, const char * WallToCalibrate);
   int LoadFATimeCalibration(const char * file_name);
-  int LoadTimePulseHeightCorrection(const char * file_name);
+  int LoadFATimePulseHeightCorrection(const char * file_name);
 
   double GetNWAXcm(int num_bar, double tleft, double tright) const;
   double GetNWBXcm(int num_bar, double tleft, double tright) const;
@@ -126,6 +128,10 @@ private :
   bool fNWBTimeCalibrated;
   bool fNWAGeometryCalibrated;
   bool fNWBGeometryCalibrated;
+  bool fNWAPulseHeightMatched;
+  bool fNWBPulseHeightMatched;
+  bool fNWAPulseHeightCalibrated;
+  bool fNWBPulseHeightCalibrated;
   bool fFATimeCalibrated;
 
   NWPositionCalibration * fNWBPositionCalibration;
@@ -136,6 +142,8 @@ private :
   NWTimeCalibration     * fNWBTimeCalibration;
   NWGeometry            * fNWAGeometry;
   NWGeometry            * fNWBGeometry;
+  NWPulseHeightCalibration * fNWAPulseHeightCalibrationTools;
+  NWPulseHeightCalibration * fNWBPulseHeightCalibrationTools;
   FATimeCalibration     * fFATimeCalibration;
 };
 
